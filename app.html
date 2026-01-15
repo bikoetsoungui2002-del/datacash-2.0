@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DataCash - Maxit Africa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+     <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        /* --- DESIGN SYSTEM : MAXIT MODERN (Warm & Clean) --- */
+        :root {
+            --bg-body: #f2f4f8;        /* Gris très doux */
+            --bg-card: #ffffff;        /* Blanc pur */
+            --primary: #d90429;        /* Rouge Maxit Vif */
+            --primary-light: #ef233c;  /* Rouge clair */
+            --secondary: #2b2d42;      /* Noir bleuté (Textes) */
+            --gold: #ffb703;           /* Jaune Or (Badges) */
+            --success: #2a9d8f;        /* Vert Sarcelle (Gains) */
+            --text-muted: #8d99ae;
+            --shadow: 0 10px 30px rgba(0,0,0,0.08);
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.05);
+            --radius: 22px;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        
+        body { 
+            margin: 0; background-color: var(--bg-body); 
+            font-family: 'Poppins', sans-serif; 
+            color: var(--secondary); display: flex; justify-content: center; min-height: 100vh;
+        }
+
+        #mobile-wrapper { 
+            width: 100%; max-width: 480px; min-height: 100vh; 
+            background: var(--bg-body); position: relative; 
+            padding-bottom: 90px; overflow-x: hidden;
+            box-shadow: 0 0 50px rgba(0,0,0,0.1);
+        }
+
+        /* --- UI COMPONENTS --- */
+        .card { 
+            background: var(--bg-card); border-radius: var(--radius); 
+            padding: 20px; box-shadow: var(--shadow-sm); 
+            margin-bottom: 15px; border: 1px solid rgba(0,0,0,0.02);
+        }
+
+        .btn-main { 
+            background: var(--primary); color: white; border: none; padding: 16px; 
+            border-radius: 50px; font-weight: 700; cursor: pointer; width: 100%; font-size: 1rem; 
+            box-shadow: 0 5px 20px rgba(217, 4, 41, 0.3); transition: 0.2s;
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+        }
+        .btn-main:active { transform: scale(0.98); background: var(--primary-light); }
+        
+        .auth-input, select.auth-input { 
+            width:100%; padding: 16px 20px; background: #fff; 
+            border: 1px solid #e0e0e0; color: var(--secondary); border-radius: 15px; 
+            margin-bottom: 12px; font-size: 0.95rem; font-weight: 500; appearance: none;
+            transition: 0.3s;
+        }
+        .auth-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(217, 4, 41, 0.1); }
+
+        /* HEADER */
+        header { 
+            position: sticky; top: 0; width: 100%; padding: 15px 20px; z-index: 100; 
+            background: rgba(242, 244, 248, 0.95); backdrop-filter: blur(10px); 
+            display: flex; justify-content: space-between; align-items: center; 
+        }
+        .logo-text { font-weight: 800; font-size: 1.5rem; color: var(--primary); letter-spacing: -1px; }
+
+        /* WALLET */
+        .wallet-card { 
+            background: linear-gradient(135deg, var(--primary), var(--primary-light)); 
+            color: white; text-align: center; padding: 35px 20px;
+            border-radius: 30px; margin-bottom: 25px;
+            box-shadow: 0 15px 35px rgba(217, 4, 41, 0.3);
+            position: relative; overflow: hidden;
+        }
+        .wallet-card::after {
+            content:''; position: absolute; top:-50%; left:-50%; width:200%; height:200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
+            animation: rotate 20s linear infinite; pointer-events: none;
+        }
+        @keyframes rotate { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+
+       /* --- ACTIONS DÉPÔT/RETRAIT MINIMALISTES --- */
+.action-grid { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 16px; 
+    margin-top: -35px; /* Chevauchement léger sur la carte solde pour le relief */
+    padding: 0 20px; 
+    position: relative; 
+    z-index: 10; 
+    margin-bottom: 30px;
+}
+
+.action-card {
+    background: white;
+    border-radius: 24px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.04);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.02);
+}
+
+.action-card:active {
+    transform: scale(0.95);
+    background: #f8f9fa;
+}
+
+/* Icônes dans des cercles doux */
+.action-icon-circle {
+    width: 52px;
+    height: 52px;
+    border-radius: 18px; /* Look "Squircle" moderne */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    transition: 0.3s;
+}
+
+/* Couleurs spécifiques Dépôt (Rouge Maxit très clair) */
+.bg-depot { background: #fff0f1; color: var(--primary); }
+
+/* Couleurs spécifiques Retrait (Bleu/Gris très clair) */
+.bg-retrait { background: #f0f4ff; color: #4361ee; }
+
+.action-label {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--secondary);
+    letter-spacing: 0.2px;
+}
+        /* PACKS COMPACT */
+        /* --- NOUVEAU DESIGN DES PACKS --- */
+/* --- PACKS À COULEURS DYNAMIQUES --- */
+.pack-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+
+.pack-item { 
+    background: white; border-radius: 24px; padding: 20px; 
+    display: flex; flex-direction: column; gap: 12px;
+    box-shadow: var(--shadow-sm); position: relative;
+    border: 1px solid #edf2f7;
+    border-top: 6px solid #ccc; /* Bordure colorée par le JS */
+    transition: 0.3s;
+}
+
+/* Couleurs par niveau */
+.border-blue { border-top-color: #3b82f6; }   /* Essai / Start */
+.border-purple { border-top-color: #8b5cf6; } /* Pro / Silver */
+.border-gold { border-top-color: #f59e0b; }   /* Master / Elite / Ultra */
+
+.pack-header { display: flex; justify-content: space-between; align-items: flex-start; }
+.pack-title { font-weight: 800; font-size: 1.1rem; color: var(--secondary); }
+
+/* Évidence du PRIX */
+.price-tag {
+    font-size: 1.1rem; font-weight: 800; color: #475569;
+    background: #f1f5f9; padding: 4px 12px; border-radius: 10px;
+}
+
+/* Évidence du GAIN */
+.gain-highlight {
+    background: #f0fdf4; border: 1px dashed var(--success);
+    padding: 12px; border-radius: 15px; display: flex; 
+    justify-content: space-between; align-items: center;
+}
+.gain-label { font-size: 0.7rem; color: #166534; font-weight: 700; text-transform: uppercase; }
+.gain-value { font-size: 1.35rem; font-weight: 900; color: var(--success); letter-spacing: -0.5px; }
+
+.daily-pill { 
+    font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; 
+    background: #fff; border: 1px solid #e2e8f0;
+}
+.pack-badge { 
+    position: absolute; top: -12px; right: 20px; background: var(--gold); 
+    color: #000; font-size: 0.65rem; font-weight: 800; padding: 5px 12px; 
+    border-radius: 20px; box-shadow: 0 4px 10px rgba(255, 183, 3, 0.4); 
+}
+
+.btn-select {
+    background: var(--secondary); color: white; border: none; 
+    padding: 12px; border-radius: 12px; font-weight: 700; 
+    font-size: 0.9rem; cursor: pointer; width: 100%; margin-top: 5px;
+}
+        /* ADMIN & ZOOM */
+        .admin-nav {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 440px; background: #1a1a1a; color: white;
+            border-radius: 50px; padding: 8px; display: flex; justify-content: space-between;
+            z-index: 2100; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .admin-tab { padding: 10px 20px; border-radius: 30px; font-size: 0.8rem; cursor: pointer; transition:0.3s; position:relative;}
+        .admin-tab.active { background: var(--primary); font-weight: bold; }
+        .badge { position:absolute; top:0; right:5px; background:red; color:white; font-size:0.6rem; width:16px; height:16px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+
+        .zoom-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000;
+            display: none; justify-content: center; align-items: center; flex-direction: column;
+        }
+        .zoom-overlay.active { display: flex; animation: fadeIn 0.2s; }
+        .zoom-img { max-width: 100%; max-height: 80vh; object-fit: contain; border-radius: 5px; box-shadow: 0 0 50px rgba(255,255,255,0.1); }
+        .zoom-close { position: absolute; top: 20px; right: 20px; color: white; font-size: 2rem; cursor: pointer; background: rgba(255,255,255,0.2); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+        /* NAVBAR USER */
+        .navbar { 
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; height: 75px; 
+            background: white; border-top: 1px solid #eee; display: flex; justify-content: space-around; align-items: center; 
+            z-index: 90; padding-bottom: 10px;
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; opacity: 0.4; font-size: 0.7rem; font-weight: 600; color: var(--secondary); transition: 0.3s; }
+        .nav-item.active { opacity: 1; color: var(--primary); transform: translateY(-3px); }
+        .nav-item svg { width: 24px; height: 24px; fill: currentColor; margin-bottom: 4px; }
+
+        /* UTILS */
+        .page { display: none; animation: slideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); } .page.active { display: block; }
+        @keyframes slideUp { from{opacity:0; transform:translateY(20px);} to{opacity:1; transform:translateY(0);} }
+        .slide-up-modal { position: fixed; bottom: -100%; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: white; z-index: 3000; transition: 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); padding: 30px 24px 40px 24px; border-radius: 35px 35px 0 0; box-shadow: 0 -10px 50px rgba(0,0,0,0.15); }
+        .slide-up-modal.active { bottom: 0; }
+        .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2900; opacity: 0; visibility: hidden; transition: 0.3s; backdrop-filter: blur(4px); }
+        .modal-bg.active { opacity: 1; visibility: visible; }
+        
+        .proof-thumb { width: 100%; height: 200px; object-fit: cover; border-radius: 12px; margin: 10px 0; cursor: zoom-in; border: 1px solid #ddd; }
+            .pack-icon-wrapper {
+    width: 45px;
+    height: 45px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+/* --- STYLE DES ICÔNES MODERNES --- */
+.pack-icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+.icon-flash { background: #fff0f1; color: #e63946; }
+.icon-hebdo { background: #eef2ff; color: #4361ee; }
+.icon-mensuel { background: #f0fdf4; color: #2a9d8f; }
+
+/* --- BANNIÈRE DE LIMITE FLASH --- */
+.limit-notice {
+    background: #fd1404; /* Bleu très clair et frais */
+    border: 1px solid #e0e7ff; /* Bordure assortie */
+    border-left: 4px solid var(--primary); /* Ligne rouge verticale pour attirer l'œil */
+    color: white; /* Texte foncé pour la lisibilité */
+    padding: 14px 18px;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    line-height: 1.4;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+}
+
+/* Style de l'icône à l'intérieur */
+.limit-notice i {
+    color: var(--primary); /* L'icône devient rouge */
+    flex-shrink: 0;
+}
+    </style>
+</head>
+<body>
+
+    <div id="mobile-wrapper">
+        
+        <div id="zoom-view" class="zoom-overlay">
+            <div class="zoom-close" onclick="closeZoom()">✕</div>
+            <img id="zoom-img-target" class="zoom-img" src="">
+            <div style="color:white; margin-top:15px; font-size:0.9rem; opacity:0.8;">Toucher pour fermer</div>
+        </div>
+
+        <div id="loader" style="position:fixed; inset:0; background:white; z-index:9999; display:flex; justify-content:center; align-items:center; flex-direction:column;">
+            <div style="font-size:3rem; margin-bottom:10px; color:var(--primary); font-weight:800;">D</div>
+            <div style="font-weight:700; color:var(--secondary); letter-spacing:1px;">DATACASH</div>
+        </div>
+
+        <section id="auth-screen" style="display:flex; flex-direction:column; justify-content:center; padding:30px; min-height:100vh;">
+            <div style="margin-bottom:40px;">
+                <h1 style="font-size:2.2rem; font-weight:800; color:var(--secondary); margin:0; line-height:1.2;">La Finance<br><span style="color:var(--primary);">Pour Tous.</span></h1>
+                <p style="color:var(--text-muted); margin-top:10px;">La plateforme n°1 en Afrique Centrale & de l'Ouest.</p>
+            </div>
+            
+            <div id="auth-container">
+                <input type="text" id="auth-name" class="auth-input register-only" placeholder="Nom Complet" style="display:none;">
+                <select id="auth-country" class="auth-input register-only" style="display:none;"></select>
+                <input type="email" id="auth-email" class="auth-input" placeholder="Email ou Numéro">
+                <input type="password" id="auth-pass" class="auth-input" placeholder="Mot de passe">
+                
+                <button class="btn-main" onclick="handleAuth()" id="auth-btn">Connexion</button>
+                
+                <div style="margin-top:25px; text-align:center;">
+                    <span onclick="toggleAuthMode()" style="color:var(--primary); font-weight:700; cursor:pointer;" id="auth-toggle-text">Créer un compte maintenant</span>
+                </div>
+            </div>
+        </section>
+
+        <div id="app-content" style="display:none;">
+            <header>
+                <div class="logo-text">DataCash<span style="color:var(--primary)">.</span></div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div style="text-align:right;">
+                        <div id="header-name" style="font-weight:700; font-size:0.9rem;">...</div>
+                        <div style="font-size:0.7rem; color:var(--success);">● En ligne</div>
+                    </div>
+                    <div class="user-avatar" id="header-avatar" style="width:40px; height:40px; border-radius:50%; background-size:cover; border:2px solid #eee;"></div>
+                </div>
+            </header>
+
+            <div style="padding: 20px 20px 100px 20px;">
+                
+                <section id="portefeuille" class="page active">
+                    <div class="wallet-card">
+                        <div style="font-size:0.9rem; opacity:0.9; margin-bottom:5px;">Solde Disponible</div>
+                        <div style="display:flex; justify-content:center; align-items:baseline; gap:5px;">
+                            <span id="user-balance" style="font-size:2.8rem; font-weight:800;">0</span>
+                            <span id="user-currency-code" style="font-size:1.2rem; font-weight:600;">FCFA</span>
+                        </div>
+                    </div>
+
+                    <div class="action-grid">
+    <div class="action-card" onclick="openModal('payment-modal')">
+        <div class="action-icon-circle bg-depot">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+        </div>
+        <div class="action-label">Dépôt</div>
+    </div>
+
+    <div class="action-card" onclick="alert('Retrait disponible sous 24h ouvrées.')">
+        <div class="action-icon-circle bg-retrait">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        </div>
+        <div class="action-label">Retrait</div>
+    </div>
+</div>
+
+                    <h3 style="margin:20px 0 15px 0; font-size:1.1rem; color:var(--secondary);">Activité Récente</h3>
+                    <div id="active-investments"></div>
+                </section>
+                
+                <section id="produits" class="page">
+                    <h2 style="margin:0 0 5px 0;">Investir</h2>
+                    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">Sélectionnez votre pays pour voir les offres.</p>
+                    <div id="packs-container"></div>
+                </section>
+
+                <section id="compte" class="page">
+                    <div class="card" style="text-align:center; padding:30px 20px;">
+                        <div id="profile-avatar" style="width:100px; height:100px; margin:0 auto 15px auto; border-radius:50%; background-size:cover; border:3px solid white; box-shadow:var(--shadow);"></div>
+                        <h2 id="profile-name" style="margin:0; font-size:1.4rem;">User</h2>
+                        <div style="color:var(--text-muted); font-size:0.9rem; margin-bottom:10px;">ID: <span id="profile-id">...</span></div>
+                        <span id="profile-country-display" style="background:#f0f2f5; padding:5px 15px; border-radius:20px; font-weight:600; font-size:0.8rem;">...</span>
+                    </div>
+
+                    <div class="card" style="padding:10px;">
+                        <div style="padding:15px; border-bottom:1px solid #f5f5f5; display:flex; justify-content:space-between;" onclick="alert('Historique')"><span>📜 Historique</span> <span>›</span></div>
+                        <div style="padding:15px; border-bottom:1px solid #f5f5f5; display:flex; justify-content:space-between;" onclick="alert('Support')"><span>📞 Support Client</span> <span>›</span></div>
+                        <div style="padding:15px; display:flex; justify-content:space-between;" onclick="alert('CGU')"><span>🔒 Sécurité</span> <span>›</span></div>
+                    </div>
+
+                    <button class="btn-main" style="background:#ffebee; color:var(--primary);" onclick="logoutUser()">Déconnexion</button>
+                </section>
+            </div>
+
+            <nav class="navbar">
+                <div class="nav-item active" onclick="navTo('portefeuille')">
+                    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg> Accueil
+                </div>
+                <div class="nav-item" onclick="navTo('produits')">
+                    <svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg> Investir
+                </div>
+                <div class="nav-item" onclick="navTo('compte')">
+                    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg> Compte
+                </div>
+            </nav>
+        </div>
+
+        <div id="admin-panel" style="display:none; position:fixed; inset:0; background:#f5f5f5; z-index:2000; overflow-y:auto;">
+            <div style="background:#1a1a1a; padding:15px 20px; color:white; display:flex; justify-content:space-between; align-items:center;">
+                <h2 style="margin:0; font-size:1.1rem;">Admin Console</h2>
+                <button onclick="logoutUser()" style="background:rgba(255,255,255,0.2); border:none; color:white; padding:5px 10px; border-radius:8px;">Exit</button>
+            </div>
+
+            <div style="padding:20px 20px 100px 20px;">
+                <div id="adm-view-requests" class="admin-view active">
+                    <h3 style="color:#1a1a1a;">Dépôts en attente</h3>
+                    <div id="admin-requests-container"></div>
+                </div>
+
+                <div id="adm-view-config" class="admin-view" style="display:none;">
+                    <h3 style="color:#1a1a1a;">Configuration Paiements</h3>
+                    <div class="card">
+                        <label style="font-size:0.8rem; color:gray;">Pays</label>
+                        <select id="admin-country-select" class="auth-input" onchange="loadAdminPaymentInfo()"></select>
+                        <label style="font-size:0.8rem; color:gray;">Nom Service (Ex: Orange Money)</label>
+                        <input type="text" id="admin-pay-name" class="auth-input">
+                        <label style="font-size:0.8rem; color:gray;">Numéro / Info</label>
+                        <input type="text" id="admin-pay-number" class="auth-input">
+                        <button class="btn-main" onclick="savePaymentInfo()">Enregistrer</button>
+                    </div>
+                </div>
+
+                <div id="adm-view-users" class="admin-view" style="display:none;">
+                    <h3 style="color:#1a1a1a;">Utilisateurs</h3>
+                    <div id="admin-users-list" class="card"></div>
+                </div>
+            </div>
+
+            <div class="admin-nav">
+                <div class="admin-tab active" onclick="switchAdmin('requests')">Validations <div id="admin-badge" class="badge" style="display:none">0</div></div>
+                <div class="admin-tab" onclick="switchAdmin('config')">Config</div>
+                <div class="admin-tab" onclick="switchAdmin('users')">Clients</div>
+            </div>
+        </div>
+
+        <div class="modal-bg" id="overlay" onclick="closeAllModals()"></div>
+
+        <div id="payment-modal" class="slide-up-modal">
+            <h3 style="margin:0 0 15px 0;">Effectuer un dépôt</h3>
+            <div style="background:#fff8e1; border:1px solid #ffecb3; padding:15px; border-radius:15px; margin-bottom:20px;">
+                <div style="font-size:0.8rem; color:#f57f17;">Méthode</div>
+                <div style="font-weight:700; color:#1a1a1a;" id="pay-method-name">...</div>
+                <div style="font-size:1.2rem; font-weight:800; margin-top:5px; word-break:break-all;" id="pay-number">...</div>
+            </div>
+            <input type="number" id="pay-amount" class="auth-input" placeholder="Montant">
+            <div style="border:2px dashed #ddd; padding:20px; text-align:center; border-radius:15px; margin-bottom:20px; cursor:pointer;" onclick="document.getElementById('proof-file').click()">
+                <div style="font-size:1.5rem;">📷</div>
+                <span id="upload-txt" style="color:var(--primary); font-weight:600;">Ajouter la capture</span>
+            </div>
+            <input type="file" id="proof-file" accept="image/*" style="display:none" onchange="handleFile(this)">
+            <button class="btn-main" onclick="submitRequest()">Envoyer</button>
+        </div>
+
+        <div id="invest-modal" class="slide-up-modal">
+            <div style="text-align:center; margin-bottom:20px;">
+                <h3 id="inv-name" style="margin:0; font-size:1.5rem; color:var(--primary);">...</h3>
+                <span style="color:gray;">Confirmation d'achat</span>
+            </div>
+            <div class="card" style="display:flex; justify-content:space-between; margin-bottom:10px; background:#f9f9f9;">
+                <span>Prix</span>
+                <span style="font-weight:700;" id="inv-price">...</span>
+            </div>
+            <div class="card" style="display:flex; justify-content:space-between; background:#f9f9f9;">
+                <span>Retour Total</span>
+                <span style="font-weight:700; color:var(--success);" id="inv-return">...</span>
+            </div>
+            <button class="btn-main" id="confirm-inv-btn">Confirmer</button>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, query, where, onSnapshot, increment, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // FIREBASE CONFIG
+        const firebaseConfig = {
+          apiKey: "AIzaSyAE4tg_3XXGuJe-jCL3Px3YQ9Gj-gI-vS4",
+          authDomain: "datacash-e1147.firebaseapp.com",
+          projectId: "datacash-e1147",
+          storageBucket: "datacash-e1147.firebasestorage.app",
+          messagingSenderId: "765034626976",
+          appId: "1:765034626976:web:b4ae792b891af98d0eaec5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- DONNEES PAYS COMPLETES ---
+        // Taux approximatifs basés sur 1 FCFA (XAF). 
+        // RDC: 1000 FCFA = ~4200 CDF (Taux ~4.2)
+        // Guinée Conakry: 1000 FCFA = ~14000 GNF (Taux ~14)
+        const allAfrica = [
+            {code:"cm", name:"Cameroun", cur:"FCFA", rate:1},
+            {code:"gq", name:"Guinée Équatoriale", cur:"FCFA", rate:1},
+            {code:"cf", name:"Centrafrique (RCA)", cur:"FCFA", rate:1},
+            {code:"cg", name:"Congo Brazzaville", cur:"FCFA", rate:1},
+            {code:"ga", name:"Gabon", cur:"FCFA", rate:1},
+            {code:"td", name:"Tchad", cur:"FCFA", rate:1},
+            {code:"ci", name:"Côte d'Ivoire", cur:"FCFA", rate:1},
+            {code:"sn", name:"Sénégal", cur:"FCFA", rate:1},
+            {code:"ml", name:"Mali", cur:"FCFA", rate:1},
+            {code:"bf", name:"Burkina Faso", cur:"FCFA", rate:1},
+            {code:"bj", name:"Bénin", cur:"FCFA", rate:1},
+            {code:"tg", name:"Togo", cur:"FCFA", rate:1},
+            {code:"ne", name:"Niger", cur:"FCFA", rate:1},
+            {code:"gw", name:"Guinée-Bissau", cur:"FCFA", rate:1},
+            
+            // Pays avec autre devise
+            {code:"cd", name:"RDC (Kinshasa)", cur:"CDF", rate:4.2},
+            {code:"gn", name:"Guinée Conakry", cur:"GNF", rate:14},
+            {code:"mg", name:"Madagascar", cur:"MGA", rate:7.5},
+            {code:"km", name:"Comores", cur:"KMF", rate:0.75},
+            {code:"dj", name:"Djibouti", cur:"DJF", rate:0.3},
+            {code:"rw", name:"Rwanda", cur:"RWF", rate:2.1},
+            {code:"bi", name:"Burundi", cur:"BIF", rate:4.8}
+        ];
+
+        // POPULATE SELECTS
+        const populateSelects = () => {
+            const selects = [document.getElementById('auth-country'), document.getElementById('admin-country-select')];
+            selects.forEach(sel => {
+                sel.innerHTML = "";
+                // Sort by name
+                allAfrica.sort((a,b)=>a.name.localeCompare(b.name)).forEach(c => {
+                    const opt = document.createElement('option');
+                    if(sel.id === 'auth-country') opt.value = JSON.stringify(c);
+                    else opt.value = c.code;
+                    opt.innerText = c.name;
+                    sel.appendChild(opt);
+                });
+            });
+        };
+        populateSelects();
+
+        let userCurrency="FCFA", userRate=1, currentUserBalance=0, userCountryCode="cm", pendingInv=null;
+        let globalPaymentSettings = {};
+
+        // --- AUTH ---
+        onAuthStateChanged(auth, async (user) => {
+            const loader = document.getElementById('loader');
+            if (user) {
+                document.getElementById('auth-screen').style.display = 'none';
+                try {
+                    const setDocSnap = await getDoc(doc(db, "settings", "payments"));
+                    if(setDocSnap.exists()) globalPaymentSettings = setDocSnap.data();
+                } catch(e) {}
+
+                const d = await getDoc(doc(db,"users",user.uid));
+                if(d.exists()) {
+                    const data = d.data();
+                    if(data.role === 'admin') {
+                        document.getElementById('admin-panel').style.display = 'block';
+                        initAdmin();
+                    } else {
+                        document.getElementById('app-content').style.display = 'block';
+                        initUser(user.uid);
+                    }
+                }
+            } else {
+                document.getElementById('auth-screen').style.display = 'flex';
+                document.getElementById('app-content').style.display = 'none';
+                document.getElementById('admin-panel').style.display = 'none';
+            }
+            setTimeout(()=>loader.style.display='none', 800);
+        });
+
+        // AUTH HANDLERS
+        window.toggleAuthMode = () => {
+            const c = document.getElementById('auth-container');
+            const isReg = c.classList.toggle('mode-register');
+            document.querySelectorAll('.register-only').forEach(el => el.style.display = isReg ? 'block' : 'none');
+            document.getElementById('auth-btn').innerText = isReg ? "S'inscrire" : "Connexion";
+            document.getElementById('auth-toggle-text').innerText = isReg ? "J'ai déjà un compte" : "Créer un compte maintenant";
+        };
+
+        window.handleAuth = async () => {
+            const email = document.getElementById('auth-email').value;
+            const pass = document.getElementById('auth-pass').value;
+            const isReg = document.getElementById('auth-container').classList.contains('mode-register');
+            const btn = document.getElementById('auth-btn');
+            btn.innerText = "..."; btn.disabled = true;
+
+            try {
+                await setPersistence(auth, browserSessionPersistence);
+                if(!isReg) {
+                    await signInWithEmailAndPassword(auth, email, pass);
+                } else {
+                    const name = document.getElementById('auth-name').value;
+                    const cData = JSON.parse(document.getElementById('auth-country').value);
+                    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+                    await setDoc(doc(db, "users", cred.user.uid), {
+                        name, email, country: cData.code, currency: cData.cur, rate: cData.rate, balance: 0, role: 'user', createdAt: new Date().toISOString()
+                    });
+                }
+            } catch(e) { alert("Erreur: " + e.message); btn.innerText="Réessayer"; btn.disabled=false; }
+        };
+
+        // USER LOGIC
+        function formatMoney(amt) { return new Intl.NumberFormat('fr-FR', {maximumFractionDigits:0}).format(amt * userRate) + " " + userCurrency; }
+
+        async function initUser(uid) {
+            onSnapshot(doc(db,"users",uid), (d) => {
+                if(d.exists()){
+                    const data = d.data();
+                    userCurrency = data.currency; userRate = data.rate; currentUserBalance = data.balance || 0; userCountryCode = data.country;
+                    document.getElementById('user-balance').innerText = new Intl.NumberFormat('fr-FR').format(currentUserBalance * userRate);
+                    document.getElementById('user-currency-code').innerText = userCurrency;
+                    document.getElementById('header-name').innerText = data.name.split(' ')[0];
+                    document.getElementById('profile-name').innerText = data.name;
+                    document.getElementById('profile-id').innerText = uid.substring(0,6).toUpperCase();
+                    
+                    const cObj = allAfrica.find(c=>c.code === data.country);
+                    document.getElementById('profile-country-display').innerText = cObj ? cObj.name : data.country.toUpperCase();
+                    
+                    const av = `https://api.dicebear.com/7.x/initials/svg?seed=${data.name}`;
+                    document.getElementById('header-avatar').style.backgroundImage = `url('${av}')`;
+                    document.getElementById('profile-avatar').style.backgroundImage = `url('${av}')`;
+                    renderPacks();
+                }
+            });
+
+            onSnapshot(query(collection(db,"investments"), where("userId","==",uid), where("status","==","active")), (snap) => {
+                const div = document.getElementById('active-investments');
+                if(snap.empty) { div.innerHTML="<div style='text-align:center; padding:20px; color:#aaa; font-size:0.8rem;'>Aucun investissement en cours.</div>"; return; }
+                let html=""; 
+                snap.forEach(doc=>{ 
+                    const i=doc.data(); 
+                    html+=`<div class="card" style='padding:15px; display:flex; justify-content:space-between; align-items:center; border-left:4px solid var(--success);'>
+                        <div><div style="font-weight:700;">${i.planName}</div><div style="font-size:0.75rem; color:#aaa;">Actif</div></div>
+                        <div style='color:var(--success); font-weight:700;'>${formatMoney(i.expectedReturn)}</div>
+                    </div>`; 
+                });
+                div.innerHTML=html;
+            });
+        }
+
+        // --- PACKS COMPACT + DAILY GAIN ---
+    window.renderPacks = () => {
+    const container = document.getElementById('packs-container');
+    let html = "";
+    
+    const categories = [
+        { 
+            title: "⚡ Forfaits Flash", 
+            type: "flash", 
+            notice: "Limite du Protocole : Une seule activation de pack Flash autorisée tous les 30 jours pour garantir la stabilité des algorithmes.",
+            icon: "zap",
+            packs: [
+                {n: "Essai", p: 15000, r: 24000, color: "blue"},
+                {n: "Bronze", p: 25000, r: 55000, color: "blue", tag: "POPULAIRE"},
+                {n: "Pro Flash", p: 35000, r: 65000, color: "purple"}
+            ] 
+        },
+        { 
+            title: "📅 Forfaits Hebdo", type: "hebdo", days: 7, icon: "calendar",
+            packs: [
+                {n: "Start I", p: 25000, r: 45000, color: "blue"},
+                {n: "Start II", p: 35000, r: 80000, color: "blue"},
+                {n: "Silver I", p: 50000, r: 120000, color: "purple"},
+                {n: "Silver II", p: 100000, r: 350000, color: "purple"}
+            ] 
+        },
+        { 
+            title: "🏦 Forfaits Mensuels", type: "mensuel", days: 30, icon: "shield-check",
+            packs: [
+                {n: "Master I", p: 100000, r: 450000, color: "gold", tag: "WHALE"},
+                {n: "Master II", p: 300000, r: 1000000, color: "gold", tag: "WHALE"},
+                {n: "Master III", p: 1000000, r: 4500000, color: "gold", tag: "WHALE"}
+            ] 
+        }
+    ];
+
+    categories.forEach(cat => {
+        html += `<h3 style='margin:25px 0 12px 0; font-size:1.1rem; font-weight:800; color:var(--secondary);'>${cat.title}</h3>`;
+        
+        if(cat.type === 'flash') {
+            html += `
+            <div class="limit-notice">
+                <i data-lucide="alert-circle"></i>
+                <span>${cat.notice}</span>
+            </div>`;
+        }
+
+        html += `<div class="pack-grid">`;
+        
+        cat.packs.forEach(p => {
+            // Affichage intelligent du gain (Journalier ou Total Express)
+            const dailyInfo = cat.days ? `+ ${formatMoney(p.r / cat.days)} / jour` : `Profit x2 en 4h`;
+            
+            html += `
+            <div class="pack-item border-${p.color}">
+                ${p.tag ? `<div class="pack-badge">${p.tag}</div>` : ''}
+                
+                <div class="pack-header">
+                    <div>
+                        <div class="pack-icon-box icon-${cat.type}">
+                            <i data-lucide="${cat.icon}"></i>
+                        </div>
+                        <div class="pack-title">${p.n}</div>
+                        <span class="daily-pill">${dailyInfo}</span>
+                    </div>
+                    <div class="price-tag">${formatMoney(p.p)}</div>
+                </div>
+
+                <div class="gain-highlight">
+                    <div class="gain-label">Retour sur investissement</div>
+                    <div class="gain-value">${formatMoney(p.r)}</div>
+                </div>
+
+                <button class="btn-select" onclick="prepareBuy('${p.n}', ${p.p}, ${p.r}, '${cat.type}')">
+                    Louer ce Robot
+                </button>
+            </div>`;
+        });
+        html += `</div>`;
+    });
+
+    container.innerHTML = html;
+    if(window.lucide) lucide.createIcons();
+};
+        window.prepareBuy = (n, p, r, type) => {
+            pendingInv = { n, p, r, type };
+            document.getElementById('inv-name').innerText = n;
+            document.getElementById('inv-price').innerText = formatMoney(p);
+            document.getElementById('inv-return').innerText = formatMoney(r);
+            openModal('invest-modal');
+        }
+
+        document.getElementById('confirm-inv-btn').onclick = async () => {
+            if(!pendingInv) return;
+            const {n, p, r, type} = pendingInv;
+            if(currentUserBalance < p) { alert("Solde insuffisant."); return; }
+            const uid = auth.currentUser.uid;
+            
+            if(type === 'flash') {
+                const check = await getDocs(query(collection(db,"investments"), where("userId","==",uid), where("planCategory","==","flash"), where("status","==","active")));
+                if(!check.empty) { alert("Pack Flash déjà actif !"); return; }
+            }
+
+            await updateDoc(doc(db,"users",uid),{balance: increment(-p)});
+            const end = new Date();
+            if(type === 'flash') end.setHours(end.getHours()+4);
+            else if(type === 'hebdo') end.setDate(end.getDate()+7);
+            else end.setDate(end.getDate()+30);
+
+            await addDoc(collection(db,"investments"), {
+                userId: uid, planName: n, planCategory: type, expectedReturn: r,
+                createdAt: new Date().toISOString(), endDate: end.toISOString(), status: 'active', userAmount: p
+            });
+            closeAllModals(); alert("✅ Activé !"); navTo('portefeuille');
+        }
+
+        // --- ADMIN SYSTEM & ZOOM ---
+        window.closeZoom = () => {
+            document.getElementById('zoom-view').classList.remove('active');
+        }
+
+        function initAdmin() {
+            loadAdminPaymentInfo();
+            // Listen Requests
+            onSnapshot(collection(db,"transactions"), (snap) => {
+                const div = document.getElementById('admin-requests-container');
+                const badge = document.getElementById('admin-badge');
+                let list = [];
+                snap.forEach(d => { if(d.data().status === 'pending') list.push({id:d.id, ...d.data()}); });
+                
+                if(list.length > 0) { badge.style.display='flex'; badge.innerText = list.length; } 
+                else { badge.style.display='none'; }
+
+                if(list.length === 0) div.innerHTML="<div style='text-align:center; padding:20px; color:gray;'>Rien à valider.</div>";
+                else {
+                    let html="";
+                    list.sort((a,b)=> new Date(b.date)-new Date(a.date)).forEach(t=>{
+                        html+=`<div class="card">
+                            <div style="display:flex; justify-content:space-between;">
+                                <strong>${t.userName}</strong> <span style="color:var(--primary); font-weight:bold;">${t.displayAmount}</span>
+                            </div>
+                            <img src="${t.proofImage}" class="proof-thumb" onclick="openZoom('${t.proofImage}')">
+                            <div style="display:flex; gap:10px;">
+                                <button class="btn-main" onclick="admApprove('${t.id}','${t.userId}',${t.amountFCFA})" style="background:#2a9d8f; font-size:0.8rem; padding:10px;">Valider</button>
+                                <button class="btn-main" onclick="admReject('${t.id}')" style="background:#d90429; font-size:0.8rem; padding:10px;">Refuser</button>
+                            </div>
+                        </div>`;
+                    });
+                    div.innerHTML=html;
+                }
+            });
+
+            onSnapshot(collection(db,"users"), (snap) => {
+                let html=""; 
+                snap.forEach(d => { const u=d.data(); if(u.role !== 'admin') html+=`<div style='border-bottom:1px solid #eee; padding:10px 0; display:flex; justify-content:space-between;'><span>${u.name} <small>(${u.country})</small></span> <strong>${Math.floor(u.balance)}</strong></div>`; });
+                document.getElementById('admin-users-list').innerHTML=html;
+            });
+        }
+
+        window.openZoom = (src) => {
+            document.getElementById('zoom-img-target').src = src;
+            document.getElementById('zoom-view').classList.add('active');
+        }
+
+        window.switchAdmin = (id) => {
+            document.querySelectorAll('.admin-view').forEach(v => { v.style.display='none'; v.classList.remove('active'); });
+            document.getElementById('adm-view-'+id).style.display='block';
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+
+        window.loadAdminPaymentInfo = async () => {
+            const code = document.getElementById('admin-country-select').value || 'cm';
+            const data = globalPaymentSettings[code] || {n: "", u: ""};
+            document.getElementById('admin-pay-name').value = data.n;
+            document.getElementById('admin-pay-number').value = data.u;
+        }
+
+        window.savePaymentInfo = async () => {
+            const code = document.getElementById('admin-country-select').value;
+            const name = document.getElementById('admin-pay-name').value;
+            const number = document.getElementById('admin-pay-number').value;
+            if(!code) return;
+            globalPaymentSettings[code] = {n: name, u: number};
+            await setDoc(doc(db, "settings", "payments"), {[code]: {n: name, u: number}}, { merge: true });
+            alert("✅ Sauvegardé");
+        }
+
+        window.admApprove=async(tid,uid,amt)=>{ if(confirm("Valider ?")){ await updateDoc(doc(db,"transactions",tid),{status:'approved'}); await updateDoc(doc(db,"users",uid),{balance:increment(amt)}); }}
+        window.admReject=async(tid)=>{ if(confirm("Refuser ?")){ await updateDoc(doc(db,"transactions",tid),{status:'rejected'}); }}
+
+        // MODALS
+        window.openModal = (id) => {
+            document.getElementById('overlay').classList.add('active');
+            document.getElementById(id).classList.add('active');
+            if(id==='payment-modal'){
+                const info = globalPaymentSettings[userCountryCode] || {n: "Contactez le support", u: "Non configuré"};
+                document.getElementById('pay-method-name').innerText = info.n;
+                document.getElementById('pay-number').innerText = info.u;
+            }
+        }
+        window.closeAllModals = () => { document.querySelectorAll('.slide-up-modal').forEach(m=>m.classList.remove('active')); document.getElementById('overlay').classList.remove('active'); }
+        window.logoutUser = () => signOut(auth);
+        window.navTo = (id) => { document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); event.currentTarget.classList.add('active'); }
+        let iconTag = "";
+if(cat.type === 'flash') iconTag = `<div class="pack-icon-wrapper icon-flash"><i data-lucide="zap"></i></div>`;
+if(cat.type === 'hebdo') iconTag = `<div class="pack-icon-wrapper icon-hebdo"><i data-lucide="calendar-days"></i></div>`;
+if(cat.type === 'mensuel') iconTag = `<div class="pack-icon-wrapper icon-mensuel"><i data-lucide="shield-check"></i></div>`;
+        window.submitRequest = () => {
+            const amt = Number(document.getElementById('pay-amount').value);
+            const file = document.getElementById('proof-file').files[0];
+            if(!amt || !file) return alert("Remplissez tout.");
+            const btn = document.querySelector('#payment-modal .btn-main'); btn.innerText="Envoi..."; btn.disabled=true;
+            
+            const r = new FileReader();
+            r.onload = (e) => {
+                const img = new Image();
+                img.onload = async () => {
+                    const c = document.createElement('canvas'); const ctx = c.getContext('2d');
+                    let w=img.width, h=img.height; const max=800; // Better quality for zoom
+                    if(w>h){if(w>max){h*=max/w;w=max}}else{if(h>max){w*=max/h;h=max}}
+                    c.width=w; c.height=h; ctx.drawImage(img,0,0,w,h);
+                    
+                    const user = auth.currentUser;
+                    const uDoc = await getDoc(doc(db,"users",user.uid));
+                    
+                    await addDoc(collection(db,"transactions"), {
+                        userId: user.uid, userName: uDoc.data().name,
+                        displayAmount: amt + " " + userCurrency, amountFCFA: amt/userRate,
+                        proofImage: c.toDataURL('image/jpeg', 0.6), status: 'pending', date: new Date().toISOString()
+                    });
+                    alert("✅ Envoyé !"); closeAllModals(); btn.innerText="Envoyer"; btn.disabled=false;
+                }; img.src=e.target.result;
+            }; r.readAsDataURL(file);
+        }
+        window.handleFile=(i)=>{ if(i.files[0]) document.getElementById('upload-txt').innerText="Capture OK ✅"; }
+    </script>
+</body>
+</html>
